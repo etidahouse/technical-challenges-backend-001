@@ -1,0 +1,31 @@
+{
+  "name": "technical-challenges-backend-001",
+  "description": "Wino Backend-Stack Hiring Test",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "start:service": "nodemon --watch service.ts --exec \"ts-node service.ts\"",
+    "start:cli": "ts-node cli.ts"
+  },
+  "author": "Wino Technologies",
+  "dependencies": {
+    "@types/amqplib": "0.8.2",
+    "@types/express": "4.17.13",
+    "@types/inquirer": "8.1.3",
+    "@types/jest": "27.4.0",
+    "@types/knex": "0.16.1",
+    "@types/node": "17.0.8",
+    "@types/uuid": "8.3.4",
+    "amqplib": "0.8.0",
+    "express": "4.17.2",
+    "inquirer": "8.2.0",
+    "jest": "27.4.7",
+    "knex": "0.95.15",
+    "nodemon": "2.0.15",
+    "pg": "8.7.1",
+    "ts-jest": "27.1.3",
+    "ts-node": "10.4.0",
+    "typescript": "4.5.4",
+    "uuid": "8.3.2"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "import"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:import/typescript"
+  ],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "import/no-useless-path-segments": ["error", {
+      "noUselessIndex": true
+    }],
+    "import/order": ["error", {
+      "alphabetize": {
+        "order": "asc"
+      },
+      "newlines-between": "always"
+    }],
+    "import/no-cycle": "error"
+  }
+}
