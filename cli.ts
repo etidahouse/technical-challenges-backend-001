@@ -1,9 +1,9 @@
-import knex from 'knex'
 import amqp from 'amqplib'
 import { prompt } from 'inquirer'
-
-import { events, products } from './data'
+import knex from 'knex'
 import { database_connection, queue_name } from './constants'
+import { events, products } from './data'
+import { Product } from './models'
 
 const pg = knex({
   client: 'pg',
@@ -16,6 +16,27 @@ async function setupExperiment() {
 
 async function resetExperiment() {
   await pg('products').update({ stock: 0 })
+  await pg('product_stock_movement_events').delete()
+}
+
+async function checkExperiment() {
+  const clonedProducts: Product[] = JSON.parse(JSON.stringify(products))
+  for (const event of events) {
+    const product = clonedProducts.find((product) => product.name === event.productName)
+    if (product === undefined) return console.error(`Product(name=${event.productName}) does not exist`)
+
+    product.stock = product.stock + event.value
+  }
+  for (const product of clonedProducts) {
+    const result = await pg<Product>('products').select('*').where({ name: product.name }).first()
+    if (result === undefined || result === null)
+      return console.error(`Product(name=${product.name}) is missing from database.`)
+
+    if (result.stock !== product.stock)
+      return console.error(
+        `Product(name=${product.name}) has ${result.stock} but it is supposed to be ${product.stock}.`,
+      )
+  }
 }
 
 async function startExperiment() {
@@ -33,13 +54,14 @@ async function startExperiment() {
 
 async function main() {
   while (true) {
-    const { choice } = await prompt<{ choice: 'SETUP' | 'START' | 'RESET' | 'END' }>([
+    const { choice } = await prompt<{ choice: 'SETUP' | 'START' | 'CHECK' | 'RESET' | 'END' }>([
       {
         name: 'choice',
         message: 'Please make a choice',
         choices: [
           { name: 'Setup', value: 'SETUP' },
           { name: 'Start', value: 'START' },
+          { name: 'Check', value: 'CHECK' },
           { name: 'Reset', value: 'RESET' },
           { name: 'End', value: 'END' },
         ],
@@ -53,6 +75,9 @@ async function main() {
         break
       case 'START':
         await startExperiment()
+        break
+      case 'CHECK':
+        await checkExperiment()
         break
       case 'RESET':
         await resetExperiment()

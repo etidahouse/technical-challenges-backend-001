@@ -3,7 +3,9 @@ export type Product = {
   stock: number
 }
 
-// TODO: Design your event type.
-export type Event = {
+export type ProductStockChangeEvent = {
   id: string
+  date: number
+  productName: string
+  value: number
 }

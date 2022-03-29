@@ -1,11 +1,11 @@
+import amqp from 'amqplib'
 import express from 'express'
 import knex from 'knex'
-import amqp from 'amqplib'
-
-import { Event } from './models'
 import { database_connection, queue_name } from './constants'
+import { ProductStockChangeEvent } from './models'
+import { manageProductStock, productStockChangeEventStorage, productStorage } from './utils'
 
-const port = 1000
+const port = 2022
 
 const pg = knex({
   client: 'pg',
@@ -29,8 +29,12 @@ amqp
       () =>
         channel.get(queue_name).then(async (message) => {
           if (message !== false) {
-            const event: Event = JSON.parse(message.content.toString())
+            const event: ProductStockChangeEvent = JSON.parse(message.content.toString())
+
             console.log(event)
+
+            await manageProductStock(event, productStockChangeEventStorage(pg), productStorage(pg))
+
             channel.ack(message)
           }
         }),
